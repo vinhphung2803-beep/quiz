@@ -1,0 +1,1376 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizCampus - Kiểm tra kiến thức</title>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --light-blue: #eff6ff;
+            --border: #dbeafe;
+            --text: #1e293b;
+            --muted: #64748b;
+            --white: #ffffff;
+            --red: #dc2626;
+            --green: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text);
+            background: linear-gradient(135deg, #eff6ff, #ffffff);
+        }
+
+        button, input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 18px 24px;
+        }
+
+        .nav-content {
+            max-width: 1000px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: var(--text);
+        }
+
+        .nav-caption {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .container {
+            width: min(900px, calc(100% - 32px));
+            margin: 32px auto;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.08);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            font-size: 29px;
+            line-height: 1.3;
+        }
+
+        h2 {
+            font-size: 22px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .info-item {
+            background: var(--light-blue);
+            border-radius: 12px;
+            padding: 18px 10px;
+            text-align: center;
+        }
+
+        .info-item strong {
+            display: block;
+            color: var(--primary);
+            font-size: 23px;
+            margin-bottom: 6px;
+        }
+
+        .info-item span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .field-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 9px;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .text-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            color: white;
+            background: var(--primary);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            color: var(--primary-dark);
+            background: var(--light-blue);
+            border: 1px solid var(--border);
+        }
+
+        .btn-block {
+            width: 100%;
+            margin-top: 18px;
+        }
+
+        .quiz-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .timer {
+            background: var(--light-blue);
+            color: var(--primary-dark);
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 21px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .timer.warning {
+            color: var(--red);
+            background: #fee2e2;
+        }
+
+        .progress-track {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.2s;
+        }
+
+        .question-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .question-number {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .answered-count {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .question-title {
+            line-height: 1.55;
+            margin-bottom: 22px;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            cursor: pointer;
+            line-height: 1.5;
+            transition: 0.2s;
+        }
+
+        .option:hover {
+            border-color: #93c5fd;
+            background: #f8fbff;
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: var(--light-blue);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        .option input {
+            margin-top: 4px;
+            accent-color: var(--primary);
+        }
+
+        .option-letter {
+            color: var(--primary);
+            font-weight: bold;
+            min-width: 20px;
+        }
+
+        .quiz-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 26px;
+            flex-wrap: wrap;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .notice {
+            padding: 12px 14px;
+            margin-top: 18px;
+            border-radius: 10px;
+            background: #fffbeb;
+            color: #92400e;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .status {
+            padding: 12px 14px;
+            margin: 16px 0;
+            border-radius: 10px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .result-header {
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 130px;
+            height: 130px;
+            border: 8px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 24px auto;
+            background: var(--light-blue);
+        }
+
+        .score-circle strong {
+            color: var(--primary);
+            font-size: 34px;
+        }
+
+        .score-circle span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .result-stat {
+            padding: 16px 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .result-stat strong {
+            display: block;
+            font-size: 21px;
+            margin-bottom: 6px;
+        }
+
+        .result-stat span {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .leaderboard {
+            margin-top: 28px;
+        }
+
+        .leaderboard-caption {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 13px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .empty-row {
+            text-align: center;
+            color: var(--muted);
+            padding: 24px;
+            white-space: normal;
+        }
+
+        .leaderboard-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            margin: 22px 0;
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 16px;
+            }
+
+            .nav-caption {
+                display: none;
+            }
+
+            .container {
+                margin: 20px auto;
+            }
+
+            .card {
+                padding: 20px 16px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .info-grid {
+                gap: 8px;
+            }
+
+            .info-item {
+                padding: 14px 5px;
+            }
+
+            .info-item strong {
+                font-size: 19px;
+            }
+
+            .info-item span {
+                font-size: 11px;
+            }
+
+            .timer {
+                font-size: 17px;
+                padding: 10px;
+            }
+
+            .question-title {
+                font-size: 20px;
+            }
+
+            .result-stats {
+                gap: 7px;
+            }
+
+            .result-stat strong {
+                font-size: 17px;
+            }
+
+            .result-stat span {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="nav-content">
+            <div class="logo">Quiz<span>Campus</span></div>
+            <div class="nav-caption">Học tập • Kiểm tra • Tiến bộ</div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- MÀN HÌNH BẮT ĐẦU -->
+        <section id="startScreen" class="card">
+            <h1>Chào mừng đến với QuizCampus!</h1>
+
+            <p class="subtitle">
+                Hoàn thành 15 câu hỏi trắc nghiệm trong 5 phút.
+                Kết quả sẽ được gửi lên bảng điểm chung của lớp.
+            </p>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>15</strong>
+                    <span>Câu hỏi</span>
+                </div>
+                <div class="info-item">
+                    <strong>05:00</strong>
+                    <span>Thời gian</span>
+                </div>
+                <div class="info-item">
+                    <strong>10</strong>
+                    <span>Điểm tối đa</span>
+                </div>
+            </div>
+
+            <label for="studentName" class="field-label">
+                Họ và tên
+            </label>
+
+            <input
+                id="studentName"
+                class="text-input"
+                type="text"
+                maxlength="50"
+                placeholder="Nhập họ và tên của bạn..."
+                autocomplete="name"
+            >
+
+            <button id="startBtn" class="btn btn-primary btn-block">
+                Bắt đầu làm bài
+            </button>
+
+            <div class="notice">
+                Thời gian bắt đầu tính sau khi nhấn nút.
+                Không tải lại trang trong khi thi.
+                Chuyển sang tab khác sẽ được ghi nhận.
+            </div>
+        </section>
+
+        <!-- MÀN HÌNH LÀM BÀI -->
+        <section id="quizScreen" class="card hidden">
+            <div class="quiz-top">
+                <div>
+                    <strong id="welcomeName">Thí sinh</strong>
+                    <p class="subtitle" style="margin: 6px 0 0;">
+                        Hãy hoàn thành bài thi trước khi hết giờ.
+                    </p>
+                </div>
+
+                <div id="timer" class="timer" aria-live="polite">
+                    05:00
+                </div>
+            </div>
+
+            <div class="progress-track">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+
+            <div class="question-meta">
+                <span id="questionNumber" class="question-number">
+                    Câu 1/15
+                </span>
+                <span id="answeredCount" class="answered-count">
+                    Đã trả lời: 0/15
+                </span>
+            </div>
+
+            <h2 id="questionTitle" class="question-title"></h2>
+
+            <div id="options" class="options"></div>
+
+            <div class="quiz-footer">
+                <button id="prevBtn" class="btn btn-secondary">
+                    ← Câu trước
+                </button>
+
+                <div class="footer-actions">
+                    <button id="nextBtn" class="btn btn-primary">
+                        Câu tiếp →
+                    </button>
+
+                    <button id="submitBtn" class="btn btn-primary">
+                        Nộp bài
+                    </button>
+                </div>
+            </div>
+
+            <div id="submitStatus" class="status error hidden"></div>
+
+            <div class="notice">
+                Số lần chuyển tab: <strong id="tabSwitchCount">0</strong>.
+                Khi nộp bài, dữ liệu sẽ được gửi lên Google Sheets.
+            </div>
+        </section>
+
+        <!-- MÀN HÌNH KẾT QUẢ -->
+        <section id="resultScreen" class="card hidden">
+            <div class="result-header">
+                <h1 id="resultHeading">Hoàn thành bài thi!</h1>
+                <p id="resultMessage" class="subtitle"></p>
+
+                <div class="score-circle">
+                    <strong id="scoreValue">0</strong>
+                    <span>/ 10 điểm</span>
+                </div>
+            </div>
+
+            <div class="result-stats">
+                <div class="result-stat">
+                    <strong id="correctValue">0/15</strong>
+                    <span>Câu đúng</span>
+                </div>
+
+                <div class="result-stat">
+                    <strong id="timeValue">00:00</strong>
+                    <span>Thời gian làm</span>
+                </div>
+
+                <div class="result-stat">
+                    <strong id="switchValue">0</strong>
+                    <span>Lần chuyển tab</span>
+                </div>
+            </div>
+
+            <div id="resultStatus" class="status success">
+                Kết quả đã được gửi lên bảng điểm chung.
+            </div>
+
+            <div class="leaderboard">
+                <h2>Bảng xếp hạng toàn lớp</h2>
+
+                <p class="leaderboard-caption">
+                    Xếp theo số câu đúng giảm dần; nếu bằng số câu đúng,
+                    người làm nhanh hơn đứng trên. Bảng điểm được lấy
+                    từ Google Sheets.
+                </p>
+
+                <button id="refreshBoardBtn" class="btn btn-secondary">
+                    Làm mới bảng xếp hạng
+                </button>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Hạng</th>
+                                <th>Họ và tên</th>
+                                <th>Điểm</th>
+                                <th>Thời gian</th>
+                                <th>Chuyển tab</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="leaderboardBody">
+                            <tr>
+                                <td colspan="5" class="empty-row">
+                                    Đang tải bảng xếp hạng...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="leaderboard-actions">
+                <button id="retryBtn" class="btn btn-primary">
+                    Làm bài mới
+                </button>
+            </div>
+        </section>
+
+        <p class="footer-note">
+            QuizCampus • HTML • CSS • JavaScript • Google Sheets
+        </p>
+    </main>
+
+    <script>
+        "use strict";
+
+        // =========================================
+        // 1. CẤU HÌNH KẾT NỐI GOOGLE APPS SCRIPT
+        // =========================================
+
+        // Thay URL bên dưới bằng URL Web app thật kết thúc bằng /exec.
+        const SCRIPT_URL =
+            "https://script.google.com/macros/s/AKfycbzeLF9aOxnKN7mnsXvvNXRTKeCTiE6D9m6u3R8w-2rwad9J3gQ4Jp1ONGXwxlWMuo5Dpw/exec";
+
+        let jsonpCounter = 0;
+
+        // =========================================
+        // 2. DỮ LIỆU 15 CÂU HỎI
+        // Không đặt đáp án đúng trong website.
+            // Máy chủ Apps Script chịu trách nhiệm chấm điểm.
+            // =========================================
+
+        const questions = [
+            {
+                id: 1,
+                question: "Tính chất vật lý nào ĐÚNG với khí oxy?",
+                options: [
+                    "Có màu xanh nhạt, có mùi đặc trưng",
+                    "Không màu, không mùi, không vị, nặng hơn không khí",
+                    "Không màu, có mùi hắc, nhẹ hơn không khí",
+                    "Có màu, không mùi, tan rất nhiều trong nước"
+                ]
+            },
+            {
+                id: 2,
+                question: "Bản chất hóa học của oxy được mô tả như thế nào?",
+                options: [
+                    "Rất kém hoạt động hóa học",
+                    "Hoạt động trung bình, khó kết hợp với chất khác",
+                    "Là đơn chất phi kim hoạt động mạnh, dễ tạo oxit",
+                    "Chỉ phản ứng khi có nhiệt độ rất cao"
+                ]
+            },
+            {
+                id: 3,
+                question: "Oxy KHÔNG có ứng dụng nào sau đây?",
+                options: [
+                    "Cung cấp cho bệnh nhân trong y tế",
+                    "Dùng cho thợ lặn, phi hành gia",
+                    "Dập tắt đám cháy lớn",
+                    "Hỗ trợ quá trình đốt cháy nhiên liệu"
+                ]
+            },
+            {
+                id: 4,
+                question: "Oxy đóng vai trò gì trong quá trình sống của sinh vật?",
+                options: [
+                    "Làm nguyên liệu quang hợp",
+                    "Cung cấp cho quá trình hô hấp",
+                    "Giúp cây xanh tạo ra chất dinh dưỡng",
+                    "Ngăn chặn quá trình oxy hóa"
+                ]
+            },
+            {
+                id: 5,
+                question: "Trong công nghiệp, oxy được dùng để:",
+                options: [
+                    "Làm mát máy móc",
+                    "Hàn cắt kim loại, luyện kim",
+                    "Bảo quản thực phẩm",
+                    "Tạo khí nhiên liệu trực tiếp"
+                ]
+            },
+            {
+                id: 6,
+                question: "Tính chất vật lý của CO₂ là gì?",
+                options: [
+                    "Không màu, không mùi, nặng hơn không khí, tan trong nước",
+                    "Có mùi hắc, nặng hơn không khí, không tan trong nước",
+                    "Không màu, không mùi, nhẹ hơn không khí",
+                    "Có màu vàng, tan rất ít trong nước"
+                ]
+            },
+            {
+                id: 7,
+                question: "Phát biểu nào ĐÚNG về bản chất hóa học của CO₂?",
+                options: [
+                    "Duy trì sự cháy và sự sống",
+                    "Không duy trì sự cháy, không duy trì sự sống",
+                    "Duy trì sự cháy nhưng không duy trì sự sống",
+                    "Không duy trì sự cháy nhưng duy trì sự sống"
+                ]
+            },
+            {
+                id: 8,
+                question: "Vai trò chính của CO₂ trong tự nhiên là gì?",
+                options: [
+                    "Cung cấp oxy cho sinh vật",
+                    "Là nguyên liệu quang hợp của cây xanh",
+                    "Giúp giữ nhiệt độ Trái Đất thấp",
+                    "Tham gia quá trình hô hấp của động vật"
+                ]
+            },
+            {
+                id: 9,
+                question: "Tại sao CO₂ dùng để dập tắt cháy?",
+                options: [
+                    "Vì nó lạnh hơn không khí",
+                    "Vì nó không duy trì sự cháy, bao phủ ngăn cách oxy",
+                    "Vì nó đốt cháy tốt",
+                    "Vì nó nhẹ hơn không khí"
+                ]
+            },
+            {
+                id: 10,
+                question: "Ứng dụng nào sau đây KHÔNG phải của CO₂?",
+                options: [
+                    "Làm nước giải khát có ga",
+                    "Sản xuất đá khô",
+                    "Thổi vào bình dưỡng khí cho bệnh nhân",
+                    "Dập cháy bằng bình chữa cháy"
+                ]
+            },
+            {
+                id: 11,
+                question: "Theo định nghĩa, ánh sáng là gì?",
+                options: [
+                    "Một dạng chất khí",
+                    "Một dạng năng lượng",
+                    "Một loại hạt chất rắn",
+                    "Một dạng nhiệt"
+                ]
+            },
+            {
+                id: 12,
+                question: "Nếu không có ánh sáng, điều gì KHÔNG xảy ra theo nội dung bài?",
+                options: [
+                    "Hệ sinh thái sụp đổ",
+                    "Trái Đất trở nên lạnh và đóng băng",
+                    "Con người thích nghi và phát triển bình thường",
+                    "Mọi vật chết dần"
+                ]
+            },
+            {
+                id: 13,
+                question: "Loại chùm sáng nào có các tia không giao nhau?",
+                options: [
+                    "Chùm sáng hội tụ",
+                    "Chùm sáng phân kì",
+                    "Chùm sáng song song",
+                    "Chùm sáng phản xạ"
+                ]
+            },
+            {
+                id: 14,
+                question: "Chùm sáng phân kì có đặc điểm gì?",
+                options: [
+                    "Các tia lan rộng ra khi truyền đi",
+                    "Các tia gặp nhau tại một điểm",
+                    "Các tia luôn song song với nhau",
+                    "Chỉ phát ra từ Mặt Trời"
+                ]
+            },
+            {
+                id: 15,
+                question: "Ứng dụng nào sau đây ĐÚNG với ánh sáng?",
+                options: [
+                    "Dùng pin Mặt Trời tạo điện",
+                    "Dập tắt đám cháy",
+                    "Làm nguyên liệu nấu ăn",
+                    "Tăng hàm lượng CO₂ trong không khí"
+                ]
+            }
+        ];
+
+        // =========================================
+        // 3. TRẠNG THÁI BÀI THI
+        // =========================================
+
+        const QUIZ_DURATION = 300;
+
+        let shuffledQuestions = [];
+        let answers = {};
+        let currentIndex = 0;
+        let remainingSeconds = QUIZ_DURATION;
+        let timerInterval = null;
+        let startTime = 0;
+        let tabSwitches = 0;
+        let quizStarted = false;
+        let quizFinished = false;
+        let submitting = false;
+
+        // =========================================
+        // 4. LẤY CÁC PHẦN TỬ HTML
+        // =========================================
+
+        const startScreen = document.getElementById("startScreen");
+        const quizScreen = document.getElementById("quizScreen");
+        const resultScreen = document.getElementById("resultScreen");
+
+        const studentNameInput = document.getElementById("studentName");
+        const startBtn = document.getElementById("startBtn");
+
+        const timerElement = document.getElementById("timer");
+        const questionNumber = document.getElementById("questionNumber");
+        const questionTitle = document.getElementById("questionTitle");
+        const optionsElement = document.getElementById("options");
+        const answeredCount = document.getElementById("answeredCount");
+        const progressBar = document.getElementById("progressBar");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const submitBtn = document.getElementById("submitBtn");
+        const submitStatus = document.getElementById("submitStatus");
+
+        // =========================================
+        // 5. CÁC HÀM TIỆN ÍCH
+        // =========================================
+
+        function shuffleArray(array) {
+            const result = [...array];
+
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+
+            return result;
+        }
+
+        function formatTime(totalSeconds) {
+            const seconds = Math.max(
+                0,
+                Math.floor(Number(totalSeconds) || 0)
+            );
+
+            const minutes = Math.floor(seconds / 60);
+            const remainder = seconds % 60;
+
+            return String(minutes).padStart(2, "0")
+                + ":"
+                + String(remainder).padStart(2, "0");
+        }
+
+        // Gửi yêu cầu JSONP để kết nối với Apps Script.
+        // Cách này tránh việc fetch bị chặn bởi CORS trong một số trường hợp.
+        function requestJSONP(params) {
+            return new Promise(function (resolve, reject) {
+                const callbackName =
+                    "qcCallback_" + Date.now() + "_" + (++jsonpCounter);
+
+                const script = document.createElement("script");
+
+                const query = new URLSearchParams({
+                    ...params,
+                    callback: callbackName
+                });
+
+                let completed = false;
+
+                function cleanup() {
+                    delete window[callbackName];
+                    script.remove();
+                }
+
+                const timeout = setTimeout(function () {
+                    if (completed) return;
+
+                    completed = true;
+                    cleanup();
+
+                    reject(new Error(
+                        "Máy chủ phản hồi quá lâu. Hãy thử lại."
+                    ));
+                }, 20000);
+
+                window[callbackName] = function (response) {
+                    if (completed) return;
+
+                    completed = true;
+                    clearTimeout(timeout);
+                    cleanup();
+
+                    if (!response || !response.ok) {
+                        reject(new Error(
+                            response?.message || "Yêu cầu không thành công."
+                        ));
+                        return;
+                    }
+
+                    resolve(response);
+                };
+
+                script.onerror = function () {
+                    if (completed) return;
+
+                    completed = true;
+                    clearTimeout(timeout);
+                    cleanup();
+
+                    reject(new Error(
+                        "Không kết nối được Apps Script. " +
+                        "Hãy kiểm tra URL và quyền truy cập."
+                    ));
+                };
+
+                script.src = SCRIPT_URL + "?" + query.toString();
+
+                document.body.appendChild(script);
+            });
+        }
+
+        // =========================================
+        // 6. BẮT ĐẦU BÀI THI
+        // =========================================
+
+        startBtn.addEventListener("click", startQuiz);
+
+        function startQuiz() {
+            const name = studentNameInput.value.trim();
+
+            if (!name) {
+                alert("Bạn hãy nhập họ và tên trước khi bắt đầu!");
+                studentNameInput.focus();
+                return;
+            }
+
+            if (
+                !SCRIPT_URL.startsWith("https://script.google.com/")
+                || !SCRIPT_URL.endsWith("/exec")
+            ) {
+                alert(
+                    "Bạn chưa thay URL Apps Script thật.\n\n" +
+                    "Hãy sửa biến SCRIPT_URL ở đầu phần JavaScript."
+                );
+                return;
+            }
+
+            shuffledQuestions = shuffleArray(questions);
+            answers = {};
+            currentIndex = 0;
+            remainingSeconds = QUIZ_DURATION;
+            tabSwitches = 0;
+            quizStarted = true;
+            quizFinished = false;
+            submitting = false;
+            startTime = Date.now();
+
+            document.getElementById("welcomeName").textContent = name;
+            document.getElementById("tabSwitchCount").textContent = "0";
+
+            submitStatus.classList.add("hidden");
+            submitBtn.disabled = false;
+
+            startScreen.classList.add("hidden");
+            resultScreen.classList.add("hidden");
+            quizScreen.classList.remove("hidden");
+
+            renderQuestion();
+            updateTimerDisplay();
+
+            clearInterval(timerInterval);
+
+            timerInterval = setInterval(function () {
+                remainingSeconds = Math.max(0, remainingSeconds - 1);
+                updateTimerDisplay();
+
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    finishQuiz(true);
+                }
+            }, 1000);
+        }
+
+        // =========================================
+        // 7. HIỂN THỊ CÂU HỎI
+        // =========================================
+
+        function renderQuestion() {
+            const question = shuffledQuestions[currentIndex];
+
+            questionNumber.textContent =
+                `Câu ${currentIndex + 1}/${shuffledQuestions.length}`;
+
+            questionTitle.textContent = question.question;
+            optionsElement.innerHTML = "";
+
+            question.options.forEach(function (optionText, index) {
+                const label = document.createElement("label");
+                label.className = "option";
+
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "questionAnswer";
+                radio.value = index;
+                radio.checked = answers[question.id] === index;
+
+                const letter = document.createElement("span");
+                letter.className = "option-letter";
+                letter.textContent = String.fromCharCode(65 + index) + ".";
+
+                const text = document.createElement("span");
+                text.textContent = optionText;
+
+                if (radio.checked) {
+                    label.classList.add("selected");
+                }
+
+                radio.addEventListener("change", function () {
+                    if (quizFinished || submitting) return;
+
+                    answers[question.id] = index;
+                    renderQuestion();
+                });
+
+                label.append(radio, letter, text);
+                optionsElement.appendChild(label);
+            });
+
+            const answered = Object.keys(answers).length;
+
+            answeredCount.textContent =
+                `Đã trả lời: ${answered}/${shuffledQuestions.length}`;
+
+            progressBar.style.width =
+                `${(answered / shuffledQuestions.length) * 100}%`;
+
+            prevBtn.disabled = currentIndex === 0;
+
+            nextBtn.disabled =
+                currentIndex === shuffledQuestions.length - 1;
+
+            nextBtn.classList.toggle(
+                "hidden",
+                currentIndex === shuffledQuestions.length - 1
+            );
+        }
+
+        prevBtn.addEventListener("click", function () {
+            if (currentIndex > 0 && !quizFinished && !submitting) {
+                currentIndex--;
+                renderQuestion();
+            }
+        });
+
+        nextBtn.addEventListener("click", function () {
+            if (
+                currentIndex < shuffledQuestions.length - 1
+                && !quizFinished
+                && !submitting
+            ) {
+                currentIndex++;
+                renderQuestion();
+            }
+        });
+
+        // =========================================
+        // 8. ĐỒNG HỒ ĐẾM NGƯỢC
+        // =========================================
+
+        function updateTimerDisplay() {
+            timerElement.textContent = formatTime(remainingSeconds);
+
+            timerElement.classList.toggle(
+                "warning",
+                remainingSeconds <= 60
+            );
+        }
+
+        // =========================================
+        // 9. GHI NHẬN CHUYỂN TAB
+        // =========================================
+
+        document.addEventListener("visibilitychange", function () {
+            if (
+                document.hidden
+                && quizStarted
+                && !quizFinished
+            ) {
+                tabSwitches++;
+
+                document.getElementById("tabSwitchCount").textContent =
+                    String(tabSwitches);
+            }
+        });
+
+        // =========================================
+        // 10. NỘP BÀI VÀ GỬI LÊN MÁY CHỦ
+        // =========================================
+
+        submitBtn.addEventListener("click", function () {
+            if (submitting || quizFinished) return;
+
+            const unanswered =
+                shuffledQuestions.length - Object.keys(answers).length;
+
+            if (unanswered > 0 && remainingSeconds > 0) {
+                const confirmed = confirm(
+                    `Bạn còn ${unanswered} câu chưa trả lời. ` +
+                    "Bạn vẫn muốn nộp bài?"
+                );
+
+                if (!confirmed) return;
+            }
+
+            finishQuiz(false);
+        });
+
+        async function finishQuiz(timeUp) {
+            if (quizFinished || submitting) return;
+
+            submitting = true;
+            quizStarted = false;
+
+            clearInterval(timerInterval);
+
+            submitBtn.disabled = true;
+            submitStatus.classList.add("hidden");
+
+            const elapsedSeconds = Math.min(
+                QUIZ_DURATION,
+                Math.floor((Date.now() - startTime) / 1000)
+            );
+
+            // Gửi câu trả lời theo ID câu hỏi.
+            // Apps Script sẽ tự chấm điểm.
+            const payload = {
+                action: "submit",
+                name: studentNameInput.value.trim(),
+                answers: JSON.stringify(answers),
+                elapsedSeconds: String(elapsedSeconds),
+                tabSwitches: String(tabSwitches)
+            };
+
+            try {
+                const response = await requestJSONP(payload);
+
+                quizFinished = true;
+                submitting = false;
+
+                showResult(response.result, timeUp);
+
+                quizScreen.classList.add("hidden");
+                resultScreen.classList.remove("hidden");
+
+            } catch (error) {
+                // Cho phép người dùng gửi lại nếu lỗi kết nối.
+                submitting = false;
+                quizStarted = true;
+                submitBtn.disabled = false;
+
+                submitStatus.textContent =
+                    "Chưa gửi được kết quả lên bảng điểm chung. " +
+                    error.message +
+                    " Hãy kiểm tra mạng hoặc URL Apps Script, sau đó nhấn Nộp bài để thử lại.";
+
+                submitStatus.classList.remove("hidden");
+                submitStatus.classList.add("error");
+
+                alert(
+                    "Chưa gửi được bài lên Google Sheets.\n\n" +
+                    error.message +
+                    "\n\nHãy kiểm tra kết nối và thử nộp lại."
+                );
+            }
+        }
+
+        // =========================================
+        // 11. HIỂN THỊ KẾT QUẢ
+        // =========================================
+
+        function showResult(result, timeUp) {
+            document.getElementById("resultHeading").textContent =
+                timeUp ? "Đã hết thời gian!" : "Hoàn thành bài thi!";
+
+            document.getElementById("resultMessage").textContent =
+                `Chúc mừng ${result.name}, bạn đã hoàn thành bài kiểm tra.`;
+
+            document.getElementById("scoreValue").textContent =
+                Number(result.score).toFixed(1);
+
+            document.getElementById("correctValue").textContent =
+                `${result.correct}/${result.total}`;
+
+            document.getElementById("timeValue").textContent =
+                formatTime(result.elapsedSeconds);
+
+            document.getElementById("switchValue").textContent =
+                String(result.tabSwitches);
+
+            document.getElementById("resultStatus").textContent =
+                "Kết quả đã được gửi lên Google Sheets.";
+
+            renderLeaderboard();
+        }
+
+        // =========================================
+        // 12. TẢI BẢNG XẾP HẠNG CHUNG
+        // =========================================
+
+        async function renderLeaderboard() {
+            const body = document.getElementById("leaderboardBody");
+
+            body.innerHTML = `
+                <tr>
+                    <td colspan="5" class="empty-row">
+                        Đang tải bảng xếp hạng...
+                    </td>
+                </tr>
+            `;
+
+            try {
+                const response = await requestJSONP({
+                    action: "leaderboard"
+                });
+
+                body.innerHTML = "";
+
+                if (!response.results.length) {
+                    body.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="empty-row">
+                                Chưa có kết quả nào.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                response.results.forEach(function (item, index) {
+                    const row = document.createElement("tr");
+
+                    const values = [
+                        index + 1,
+                        item.name,
+                        Number(item.score).toFixed(1) + "/10",
+                        formatTime(item.elapsedSeconds),
+                        Number(item.tabSwitches) || 0
+                    ];
+
+                    values.forEach(function (value) {
+                        const cell = document.createElement("td");
+                        cell.textContent = String(value);
+                        row.appendChild(cell);
+                    });
+
+                    body.appendChild(row);
+                });
+
+            } catch (error) {
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-row">
+                            Không tải được bảng xếp hạng.
+                            Hãy kiểm tra URL Apps Script và quyền truy cập.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        document.getElementById("refreshBoardBtn")
+            .addEventListener("click", renderLeaderboard);
+
+        // =========================================
+        // 13. LÀM BÀI MỚI
+        // =========================================
+
+        document.getElementById("retryBtn")
+            .addEventListener("click", function () {
+                clearInterval(timerInterval);
+
+                quizStarted = false;
+                quizFinished = false;
+                submitting = false;
+
+                resultScreen.classList.add("hidden");
+                quizScreen.classList.add("hidden");
+                startScreen.classList.remove("hidden");
+
+                studentNameInput.value = "";
+                studentNameInput.focus();
+            });
+    </script>
+</body>
+</html>
