@@ -998,7 +998,8 @@
 };
 
                 script.src = SCRIPT_URL + "?" + query.toString();
-
+                console.log("JSONP URL:", script.src);
+console.log("JSONP params:", params);
                 document.body.appendChild(script);
             });
         }
