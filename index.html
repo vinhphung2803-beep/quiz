@@ -707,8 +707,8 @@
         // =========================================
         // 2. DỮ LIỆU 15 CÂU HỎI
         // Không đặt đáp án đúng trong website.
-            // Máy chủ Apps Script chịu trách nhiệm chấm điểm.
-            // =========================================
+        // Máy chủ Apps Script chịu trách nhiệm chấm điểm.
+        // =========================================
 
         const questions = [
             {
@@ -981,25 +981,21 @@
                     resolve(response);
                 };
 
-               script.onerror = function () {
-    if (completed) return;
+                script.onerror = function () {
+                    if (completed) return;
 
-    completed = true;
-    clearTimeout(timeout);
-    cleanup();
+                    completed = true;
+                    clearTimeout(timeout);
+                    cleanup();
 
-    console.error("Apps Script URL:", script.src);
-    console.error("Tham số gửi:", params);
-
-    reject(new Error(
-        "Không tải được yêu cầu từ Apps Script. " +
-        "Hãy kiểm tra kết nối mạng hoặc URL Web App."
-    ));
-};
+                    reject(new Error(
+                        "Không kết nối được Apps Script. " +
+                        "Hãy kiểm tra URL và quyền truy cập."
+                    ));
+                };
 
                 script.src = SCRIPT_URL + "?" + query.toString();
-                console.log("JSONP URL:", script.src);
-console.log("JSONP params:", params);
+
                 document.body.appendChild(script);
             });
         }
