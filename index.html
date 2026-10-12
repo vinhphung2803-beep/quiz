@@ -981,18 +981,21 @@
                     resolve(response);
                 };
 
-                script.onerror = function () {
-                    if (completed) return;
+               script.onerror = function () {
+    if (completed) return;
 
-                    completed = true;
-                    clearTimeout(timeout);
-                    cleanup();
+    completed = true;
+    clearTimeout(timeout);
+    cleanup();
 
-                    reject(new Error(
-                        "Không kết nối được Apps Script. " +
-                        "Hãy kiểm tra URL và quyền truy cập."
-                    ));
-                };
+    console.error("Apps Script URL:", script.src);
+    console.error("Tham số gửi:", params);
+
+    reject(new Error(
+        "Không tải được yêu cầu từ Apps Script. " +
+        "Hãy kiểm tra kết nối mạng hoặc URL Web App."
+    ));
+};
 
                 script.src = SCRIPT_URL + "?" + query.toString();
 
