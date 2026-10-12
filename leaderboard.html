@@ -1,0 +1,1166 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizCampus | Bảng xếp hạng</title>
+
+    <style>
+        :root {
+            --blue: #155eef;
+            --blue-dark: #123b80;
+            --blue-light: #eaf2ff;
+            --background: #f4f7fc;
+            --text: #172b4d;
+            --muted: #667085;
+            --border: #dce5f2;
+            --gold: #f4b400;
+            --silver: #8b98aa;
+            --bronze: #b87945;
+            --green: #16865c;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--background);
+            color: var(--text);
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .page {
+            width: min(1600px, 100%);
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 28px 42px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* HEADER */
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 17px;
+            display: grid;
+            place-items: center;
+            background: var(--blue);
+            color: white;
+            font-size: 27px;
+            font-weight: 900;
+            box-shadow: 0 8px 20px #155eef30;
+        }
+
+        .brand-name {
+            margin: 0;
+            color: var(--blue-dark);
+            font-size: 27px;
+            font-weight: 850;
+            letter-spacing: -0.7px;
+        }
+
+        .brand-subtitle {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: white;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 650;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: var(--green);
+        }
+
+        .status.error .status-dot {
+            background: #dc2626;
+        }
+
+        .action-button {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 11px 15px;
+            background: white;
+            color: var(--blue-dark);
+            font-weight: 750;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-button:hover {
+            border-color: var(--blue);
+            background: var(--blue-light);
+        }
+
+        .primary-button {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: white;
+        }
+
+        .primary-button:hover {
+            background: var(--blue-dark);
+            color: white;
+        }
+
+        /* TITLE */
+
+        .intro {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: var(--blue);
+            font-size: 14px;
+            font-weight: 850;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: clamp(30px, 3vw, 45px);
+            line-height: 1.15;
+            letter-spacing: -1.3px;
+        }
+
+        .page-description {
+            margin: 9px 0 0;
+            color: var(--muted);
+            font-size: 17px;
+        }
+
+        .exam-badge {
+            padding: 13px 19px;
+            border: 1px solid #cbdcff;
+            border-radius: 14px;
+            background: var(--blue-light);
+            color: var(--blue-dark);
+            font-size: 16px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        /* TOP THREE */
+
+        .podium {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .podium-card {
+            position: relative;
+            min-width: 0;
+            min-height: 155px;
+            padding: 22px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 5px 18px #17345c08;
+        }
+
+        .podium-card.first {
+            border: 2px solid #f2cd69;
+            background: linear-gradient(130deg, #fffdf3, #ffffff 75%);
+        }
+
+        .podium-card.second {
+            border-color: #d5deeb;
+        }
+
+        .podium-card.third {
+            border-color: #e9d0b9;
+        }
+
+        .medal {
+            width: 68px;
+            height: 68px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border-radius: 20px;
+            background: #f0f2f5;
+            color: #667085;
+            font-size: 28px;
+            font-weight: 900;
+        }
+
+        .first .medal {
+            background: #fff0bd;
+            color: #946200;
+        }
+
+        .second .medal {
+            background: #e9edf3;
+            color: #56657b;
+        }
+
+        .third .medal {
+            background: #f6e4d4;
+            color: #955523;
+        }
+
+        .podium-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .rank-label {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 850;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+        }
+
+        .podium-name {
+            margin: 0;
+            overflow: hidden;
+            color: var(--text);
+            font-size: clamp(17px, 1.5vw, 23px);
+            font-weight: 850;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .podium-score {
+            margin: 9px 0 0;
+            color: var(--blue);
+            font-size: 18px;
+            font-weight: 850;
+        }
+
+        .first .podium-score {
+            color: #956300;
+        }
+
+        .empty-name {
+            color: #98a2b3;
+            font-weight: 600;
+        }
+
+        /* TABLE */
+
+        .results-card {
+            min-height: 280px;
+            flex: 1;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 5px 20px #17345c08;
+        }
+
+        .results-heading {
+            padding: 19px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .results-title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 850;
+        }
+
+        .results-count {
+            padding: 7px 12px;
+            border-radius: 9px;
+            background: var(--blue-light);
+            color: var(--blue-dark);
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background: #f7f9fd;
+        }
+
+        th {
+            padding: 14px 22px;
+            color: #667085;
+            font-size: 13px;
+            font-weight: 850;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 22px;
+            border-top: 1px solid #edf1f7;
+            font-size: 17px;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f6f9ff;
+        }
+
+        tbody tr:nth-child(1) {
+            background: #fffdf5;
+        }
+
+        .rank-cell {
+            width: 85px;
+            color: var(--muted);
+            font-weight: 850;
+        }
+
+        .rank-number {
+            display: inline-grid;
+            width: 35px;
+            height: 35px;
+            place-items: center;
+            border-radius: 11px;
+            background: #eef2f7;
+            color: #526176;
+            font-size: 16px;
+        }
+
+        .rank-number.gold {
+            background: #fff0bd;
+            color: #946200;
+        }
+
+        .rank-number.silver {
+            background: #e9edf3;
+            color: #56657b;
+        }
+
+        .rank-number.bronze {
+            background: #f6e4d4;
+            color: #955523;
+        }
+
+        .student-name {
+            max-width: 460px;
+            color: #243b60;
+            font-size: 18px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .score-cell {
+            color: var(--blue);
+            font-size: 19px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .correct-cell {
+            font-weight: 750;
+            white-space: nowrap;
+        }
+
+        .time-cell {
+            color: #475467;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            padding: 45px 20px;
+            color: var(--muted);
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .error-message {
+            padding: 14px 20px;
+            display: none;
+            border-top: 1px solid #fecaca;
+            background: #fff1f2;
+            color: #b42318;
+            font-size: 15px;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .footer strong {
+            color: var(--blue-dark);
+        }
+
+        .footer-right {
+            text-align: right;
+        }
+
+        .loading {
+            opacity: 0.65;
+        }
+
+        /* PRESENTATION MODE */
+
+        body.presentation .page {
+            width: 100%;
+            min-height: 100vh;
+            padding: 2vh 3vw;
+            gap: 1.7vh;
+        }
+
+        body.presentation .logo {
+            width: 50px;
+            height: 50px;
+        }
+
+        body.presentation .brand-name {
+            font-size: 24px;
+        }
+
+        body.presentation .page-title {
+            font-size: clamp(32px, 3vw, 46px);
+        }
+
+        body.presentation .podium-card {
+            min-height: 135px;
+            padding: 17px;
+        }
+
+        body.presentation .medal {
+            width: 58px;
+            height: 58px;
+            border-radius: 17px;
+        }
+
+        body.presentation th {
+            padding: 11px 18px;
+        }
+
+        body.presentation td {
+            padding: 11px 18px;
+        }
+
+        body.presentation .rank-number {
+            width: 30px;
+            height: 30px;
+        }
+
+        body.presentation .results-heading {
+            padding: 14px 22px;
+        }
+
+        body.presentation .footer {
+            font-size: 12px;
+        }
+
+        @media (min-width: 1400px) {
+            .page {
+                padding: 32px 48px;
+            }
+
+            td {
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .page {
+                padding: 20px;
+            }
+
+            .header,
+            .intro {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .header-actions {
+                justify-content: flex-start;
+            }
+
+            .podium {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .podium-card {
+                min-height: 110px;
+            }
+
+            .exam-badge {
+                white-space: normal;
+            }
+
+            th,
+            td {
+                padding: 12px;
+            }
+
+            .footer {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .footer-right {
+                text-align: left;
+            }
+        }
+
+        @media (max-height: 800px) and (min-width: 901px) {
+            .page {
+                padding-top: 16px;
+                padding-bottom: 16px;
+                gap: 12px;
+            }
+
+            .logo {
+                width: 48px;
+                height: 48px;
+            }
+
+            .podium-card {
+                min-height: 115px;
+                padding: 15px;
+            }
+
+            .medal {
+                width: 52px;
+                height: 52px;
+            }
+
+            .results-heading {
+                padding: 12px 20px;
+            }
+
+            th {
+                padding-top: 9px;
+                padding-bottom: 9px;
+            }
+
+            td {
+                padding-top: 9px;
+                padding-bottom: 9px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+
+        <header class="header">
+            <div class="brand">
+                <div class="logo">Q</div>
+
+                <div>
+                    <p class="brand-name">QuizCampus</p>
+                    <p class="brand-subtitle">Hệ thống kiểm tra trực tuyến</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="status" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Đang kết nối...</span>
+                </div>
+
+                <button class="action-button"
+                        id="refreshButton"
+                        type="button">
+                    ↻ Làm mới
+                </button>
+
+                <button class="action-button primary-button"
+                        id="presentationButton"
+                        type="button">
+                    ⛶ Trình chiếu
+                </button>
+            </div>
+        </header>
+
+        <section class="intro">
+            <div>
+                <p class="eyebrow">CLASS LEADERBOARD</p>
+                <h1 class="page-title">Bảng xếp hạng kết quả</h1>
+                <p class="page-description">
+                    Vinh danh những sinh viên có thành tích xuất sắc nhất.
+                </p>
+            </div>
+
+            <div class="exam-badge">
+                ✦ QuizCampus · 15 câu hỏi
+            </div>
+        </section>
+
+        <section class="podium" aria-label="Top 3">
+            <article class="podium-card first">
+                <div class="medal">1</div>
+                <div class="podium-info">
+                    <p class="rank-label">🥇 Hạng nhất</p>
+                    <h2 class="podium-name" id="firstName">
+                        Đang tải...
+                    </h2>
+                    <p class="podium-score" id="firstScore">-- điểm</p>
+                </div>
+            </article>
+
+            <article class="podium-card second">
+                <div class="medal">2</div>
+                <div class="podium-info">
+                    <p class="rank-label">🥈 Hạng nhì</p>
+                    <h2 class="podium-name" id="secondName">
+                        Chờ kết quả
+                    </h2>
+                    <p class="podium-score" id="secondScore">-- điểm</p>
+                </div>
+            </article>
+
+            <article class="podium-card third">
+                <div class="medal">3</div>
+                <div class="podium-info">
+                    <p class="rank-label">🥉 Hạng ba</p>
+                    <h2 class="podium-name" id="thirdName">
+                        Chờ kết quả
+                    </h2>
+                    <p class="podium-score" id="thirdScore">-- điểm</p>
+                </div>
+            </article>
+        </section>
+
+        <section class="results-card">
+            <div class="results-heading">
+                <h2 class="results-title">Bảng điểm sinh viên</h2>
+                <div class="results-count" id="resultsCount">
+                    0 thí sinh
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hạng</th>
+                            <th>Họ và tên</th>
+                            <th>Số câu đúng</th>
+                            <th>Điểm</th>
+                            <th>Thời gian</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="leaderboardBody">
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                Đang tải bảng xếp hạng...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+        </section>
+
+        <footer class="footer">
+            <div>
+                <strong>QuizCampus</strong>
+                · Học tập, thử thách và bứt phá.
+            </div>
+
+            <div class="footer-right">
+                <div id="lastUpdated">Chưa cập nhật dữ liệu</div>
+                <div>Tự động cập nhật mỗi 15 giây</div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        "use strict";
+
+        // THAY BANG URL WEB APP CUA BAN
+        const SCRIPT_URL =
+            "https://script.google.com/macros/s/AKfycbzeLF9aOxnKN7mnsXvvNXRTKeCTiE6D9m6u3R8w-2rwad9J3gQ4Jp1ONGXwxlWMuo5Dpw/exec ";
+
+        const REFRESH_INTERVAL = 15000;
+        const MAX_VISIBLE_ROWS = 10;
+
+        let jsonpCounter = 0;
+        let isLoading = false;
+        let lastSuccessfulData = [];
+
+        const statusBox =
+            document.getElementById("connectionStatus");
+
+        const statusText =
+            document.getElementById("statusText");
+
+        const errorMessage =
+            document.getElementById("errorMessage");
+
+        const leaderboardBody =
+            document.getElementById("leaderboardBody");
+
+        const refreshButton =
+            document.getElementById("refreshButton");
+
+        // GOI APPS SCRIPT BANG JSONP
+        function requestJSONP(params) {
+            return new Promise(function (resolve, reject) {
+                if (
+                    !SCRIPT_URL.startsWith(
+                        "https://script.google.com/macros/s/"
+                    ) ||
+                    !SCRIPT_URL.endsWith("/exec")
+                ) {
+                    reject(
+                        new Error(
+                            "Bạn chưa nhập đúng URL Apps Script /exec."
+                        )
+                    );
+                    return;
+                }
+
+                const callbackName =
+                    "qcCallback_" +
+                    Date.now() +
+                    "_" +
+                    (++jsonpCounter);
+
+                const query = new URLSearchParams({
+                    ...params,
+                    callback: callbackName
+                });
+
+                const script = document.createElement("script");
+                let settled = false;
+
+                const timeoutId = setTimeout(function () {
+                    finish(
+                        new Error(
+                            "Quá thời gian chờ Apps Script phản hồi."
+                        )
+                    );
+                }, 20000);
+
+                function cleanup() {
+                    clearTimeout(timeoutId);
+                    script.remove();
+                    delete window[callbackName];
+                }
+
+                function finish(error, data) {
+                    if (settled) return;
+
+                    settled = true;
+                    cleanup();
+
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(data);
+                    }
+                }
+
+                window[callbackName] = function (data) {
+                    finish(null, data);
+                };
+
+                script.onerror = function () {
+                    finish(
+                        new Error(
+                            "Không thể tải dữ liệu từ Apps Script."
+                        )
+                    );
+                };
+
+                script.src = SCRIPT_URL + "?" + query.toString();
+                document.body.appendChild(script);
+            });
+        }
+
+        // DINH DANG THOI GIAN
+        function formatTime(seconds) {
+            const total = Math.max(
+                0,
+                Math.floor(Number(seconds) || 0)
+            );
+
+            const minutes = Math.floor(total / 60);
+            const remainingSeconds = total % 60;
+
+            return (
+                String(minutes).padStart(2, "0") +
+                ":" +
+                String(remainingSeconds).padStart(2, "0")
+            );
+        }
+
+        // CHUYEN DU LIEU THANH VAN BAN AN TOAN
+        function setText(id, value) {
+            document.getElementById(id).textContent = value;
+        }
+
+        function getRankClass(rank) {
+            if (rank === 1) return "gold";
+            if (rank === 2) return "silver";
+            if (rank === 3) return "bronze";
+            return "";
+        }
+
+        function setStatus(connected, message) {
+            statusBox.classList.toggle("error", !connected);
+            statusText.textContent = message;
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = "block";
+        }
+
+        function clearError() {
+            errorMessage.textContent = "";
+            errorMessage.style.display = "none";
+        }
+
+        // CAP NHAT KHU VUC TOP 3
+        function renderPodium(results) {
+            const positions = [
+                {
+                    nameId: "firstName",
+                    scoreId: "firstScore",
+                    index: 0
+                },
+                {
+                    nameId: "secondName",
+                    scoreId: "secondScore",
+                    index: 1
+                },
+                {
+                    nameId: "thirdName",
+                    scoreId: "thirdScore",
+                    index: 2
+                }
+            ];
+
+            positions.forEach(function (position) {
+                const result = results[position.index];
+
+                if (result) {
+                    setText(position.nameId, result.name);
+                    setText(
+                        position.scoreId,
+                        Number(result.correct) +
+                        "/" +
+                        Number(result.total) +
+                        " câu đúng · " +
+                        Number(result.score).toFixed(1) +
+                        " điểm"
+                    );
+                } else {
+                    setText(
+                        position.nameId,
+                        results.length === 0
+                            ? "Chưa có thí sinh"
+                            : "Chờ kết quả"
+                    );
+
+                    setText(position.scoreId, "-- điểm");
+                }
+            });
+        }
+
+        // VE BANG XEP HANG
+        function renderTable(results) {
+            leaderboardBody.replaceChildren();
+
+            if (results.length === 0) {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+
+                cell.colSpan = 5;
+                cell.className = "empty-state";
+                cell.textContent =
+                    "Chưa có bài nộp nào. Hãy chờ các bạn hoàn thành bài quiz!";
+
+                row.appendChild(cell);
+                leaderboardBody.appendChild(row);
+
+                return;
+            }
+
+            const visibleResults =
+                results.slice(0, MAX_VISIBLE_ROWS);
+
+            visibleResults.forEach(function (result, index) {
+                const rank = index + 1;
+                const row = document.createElement("tr");
+
+                const rankCell = document.createElement("td");
+                rankCell.className = "rank-cell";
+
+                const rankBadge = document.createElement("span");
+                rankBadge.className =
+                    "rank-number " + getRankClass(rank);
+                rankBadge.textContent = rank;
+
+                rankCell.appendChild(rankBadge);
+
+                const nameCell = document.createElement("td");
+                nameCell.className = "student-name";
+                nameCell.textContent = result.name;
+
+                const correctCell = document.createElement("td");
+                correctCell.className = "correct-cell";
+                correctCell.textContent =
+                    result.correct + "/" + result.total;
+
+                const scoreCell = document.createElement("td");
+                scoreCell.className = "score-cell";
+                scoreCell.textContent =
+                    Number(result.score).toFixed(1);
+
+                const timeCell = document.createElement("td");
+                timeCell.className = "time-cell";
+                timeCell.textContent =
+                    formatTime(result.elapsedSeconds);
+
+                row.append(
+                    rankCell,
+                    nameCell,
+                    correctCell,
+                    scoreCell,
+                    timeCell
+                );
+
+                leaderboardBody.appendChild(row);
+            });
+        }
+
+        // LAY VA SAP XEP DU LIEU
+        function normalizeResults(data) {
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Dữ liệu bảng điểm không đúng định dạng."
+                );
+            }
+
+            return data
+                .map(function (item) {
+                    return {
+                        name: String(item.name || "Không có tên"),
+                        correct: Number(item.correct) || 0,
+                        total: Number(item.total) || 15,
+                        score: Number(item.score) || 0,
+                        elapsedSeconds:
+                            Number(item.elapsedSeconds) || 0,
+                        tabSwitches:
+                            Number(item.tabSwitches) || 0
+                    };
+                })
+                .sort(function (a, b) {
+                    if (b.correct !== a.correct) {
+                        return b.correct - a.correct;
+                    }
+
+                    return a.elapsedSeconds - b.elapsedSeconds;
+                });
+        }
+
+        // TAI LAI BANG DIEM
+        async function loadLeaderboard() {
+            if (isLoading) return;
+
+            isLoading = true;
+            refreshButton.disabled = true;
+            refreshButton.classList.add("loading");
+
+            try {
+                const response = await requestJSONP({
+                    action: "leaderboard"
+                });
+
+                if (!response || response.ok !== true) {
+                    throw new Error(
+                        response && response.message
+                            ? response.message
+                            : "Apps Script không trả về kết quả hợp lệ."
+                    );
+                }
+
+                const results =
+                    normalizeResults(response.results || []);
+
+                lastSuccessfulData = results;
+
+                renderPodium(results);
+                renderTable(results);
+
+                setText(
+                    "resultsCount",
+                    results.length + " thí sinh"
+                );
+
+                setText(
+                    "lastUpdated",
+                    "Cập nhật lúc " +
+                    new Date().toLocaleTimeString("vi-VN")
+                );
+
+                setStatus(true, "Đã kết nối");
+                clearError();
+
+            } catch (error) {
+                console.error(
+                    "Lỗi tải bảng xếp hạng:",
+                    error
+                );
+
+                setStatus(false, "Lỗi kết nối");
+
+                showError(
+                    "Không tải được bảng điểm: " +
+                    error.message +
+                    " Hãy kiểm tra URL /exec và quyền truy cập Apps Script."
+                );
+
+                // Giu nguyen ket qua lan truoc neu co
+                if (lastSuccessfulData.length === 0) {
+                    renderPodium([]);
+                }
+
+            } finally {
+                isLoading = false;
+                refreshButton.disabled = false;
+                refreshButton.classList.remove("loading");
+            }
+        }
+
+        // NUT LAM MOI
+        refreshButton.addEventListener(
+            "click",
+            loadLeaderboard
+        );
+
+        // CHE DO TRINH CHIEU
+        const presentationButton =
+            document.getElementById("presentationButton");
+
+        presentationButton.addEventListener(
+            "click",
+            async function () {
+                try {
+                    if (!document.fullscreenElement) {
+                        await document.documentElement.requestFullscreen();
+                    } else {
+                        await document.exitFullscreen();
+                    }
+                } catch (error) {
+                    console.error(
+                        "Không thể bật toàn màn hình:",
+                        error
+                    );
+                }
+            }
+        );
+
+        document.addEventListener(
+            "fullscreenchange",
+            function () {
+                const active =
+                    Boolean(document.fullscreenElement);
+
+                document.body.classList.toggle(
+                    "presentation",
+                    active
+                );
+
+                presentationButton.textContent = active
+                    ? "⛶ Thoát toàn màn hình"
+                    : "⛶ Trình chiếu";
+            }
+        );
+
+        // TU DONG CAP NHAT MOI 15 GIAY
+        loadLeaderboard();
+
+        setInterval(function () {
+            if (!document.hidden) {
+                loadLeaderboard();
+            }
+        }, REFRESH_INTERVAL);
+    </script>
+</body>
+</html>
