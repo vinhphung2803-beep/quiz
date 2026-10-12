@@ -779,12 +779,15 @@
         // GOI APPS SCRIPT BANG JSONP
         function requestJSONP(params) {
             return new Promise(function (resolve, reject) {
-                if (
-                    !SCRIPT_URL.startsWith(
-                        "https://script.google.com/macros/s/AKfycbzeLF9aOxnKN7mnsXvvNXRTKeCTiE6D9m6u3R8w-2rwad9J3gQ4Jp1ONGXwxlWMuo5Dpw/exec"
-                    ) ||
-                    !SCRIPT_URL.endsWith("/exec")
-                ) {
+               const cleanUrl = SCRIPT_URL.trim();
+
+if (
+    !cleanUrl.startsWith("https://script.google.com/macros/s/") ||
+    !cleanUrl.endsWith("/exec")
+) {
+    reject(new Error("URL Apps Script không đúng định dạng."));
+    return;
+} {
                     reject(
                         new Error(
                             "Bạn chưa nhập đúng URL Apps Script /exec."
@@ -846,7 +849,7 @@
                     );
                 };
 
-                script.src = SCRIPT_URL + "?" + query.toString();
+                script.src = cleanUrl + "?" + query.toString();
                 document.body.appendChild(script);
             });
         }
